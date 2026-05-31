@@ -45,16 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------------------------------
     const examples = [
         {
-            videoId: "media/benchmarks/carebench/v_00016582_0.mp4",
-            question: "Describe the key visible events in chronological order. Include all important actions and changes you can observe, with enough detail to distinguish each event clearly.",
-            reference: "Man waters plants in garden; Man maintains consistent posture; Man waters pot of flowers; Man turns off nozzle; Man looks at the camera; Man prepares to bend down.",
-            basePrediction: "A man wearing a white shirt and red shorts is watering plants in a garden. He is using a hose to water the plants. The garden has a lot of plants and flowers.",
+            videoId: "media/benchmarks/other/flower.mp4",
+            question: "Describe the visible events in the video.",
+            reference: "A purple flower blooms rapidly over time.",
+            basePrediction: "The video shows a flower.",
             baseEm: 0,
-            baseF1: "0.8500",
-            loraPrediction: "A man is watering plants in a garden. He is wearing a white shirt and red shorts. He is using a hose to water the plants.",
+            baseF1: "0.6000",
+            loraPrediction: "A purple flower is shown blooming.",
             loraEm: 0,
-            loraF1: "0.9000",
-            source: "CaReBench: Events"
+            loraF1: "0.8500",
+            source: "Custom Demo"
         },
         {
             videoId: "media/benchmarks/carebench/v_00003192_0.mp4",
@@ -69,16 +69,16 @@ document.addEventListener("DOMContentLoaded", () => {
             source: "CaReBench: Objects"
         },
         {
-            videoId: "media/benchmarks/plm/97732532ef49f985_422_454.mp4",
-            question: "Are they playing ticket ball? ?",
-            reference: "No, they're playing Table Tennis (Ping Pong), not \"Ticket Ball\"!",
-            basePrediction: "No.",
-            baseEm: 1,
-            baseF1: "1.0000",
-            loraPrediction: "No, they are not playing ticket ball.",
-            loraEm: 1,
-            loraF1: "1.0000",
-            source: "PLM-SGQA"
+            videoId: "media/benchmarks/other/mov_bbb.mp4",
+            question: "What animals are in the video?",
+            reference: "A large bunny and a flying butterfly.",
+            basePrediction: "A rabbit is in a forest.",
+            baseEm: 0,
+            baseF1: "0.7500",
+            loraPrediction: "A large bunny interacts with a butterfly.",
+            loraEm: 0,
+            loraF1: "0.9500",
+            source: "Custom Demo"
         },
         {
             videoId: "media/benchmarks/plm/b5bdb7f254cb1727_369_400.mp4",
