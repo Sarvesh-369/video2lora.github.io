@@ -18,7 +18,7 @@
             <div class="authors">
                 <a class="author" href="https://manansuri.com" target="_blank">Manan Suri<sup>†</sup></a>
                 <a class="author" href="https://sarvesh-369.github.io/" target="_blank">Sarvesh Baskar</a>
-                <a class="author" href="https://www.cs.umd.edu/~dmanocha/" target="_blank">Dinesh Manocha<sup>†</sup></a>
+                <a class="author" href="https://www.cs.umd.edu/~dm/" target="_blank">Dinesh Manocha<sup>†</sup></a>
             </div>
             
             <div class="affiliations">
@@ -53,6 +53,18 @@
             <a href="#bibtex" class="nav-link">BibTeX</a>
         </div>
     </nav>
+
+    <!-- Overview Diagram Section -->
+    <section class="section" style="padding: 3rem 0; border-bottom: none;">
+        <div class="container" style="text-align: center;">
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 0;">
+                <img src="Vid2LoRA-actual-animated.svg" alt="Vid2LoRA Overview" style="width: 100%; height: auto; max-width: 900px; border-radius: 8px; border: 1px solid var(--border-color); padding: 1rem; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
+                <p class="caption" style="text-align: left; max-width: 900px; margin: 0 auto; font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary);">
+                    <strong>Figure 1: VIDEO2LORA overview.</strong> <strong>Training (left):</strong> A frozen VLM encodes the input video into hidden states. The trainable VIDEO2LORA hypernetwork reads these states and generates LoRA adapter weights in a single forward pass. The adapter-augmented frozen VLM is trained against teacher-generated targets. <strong>Inference (right):</strong> Given a new video, VIDEO2LORA generates the LoRA adapter once. The frozen VLM, augmented with this adapter, answers arbitrary text queries without visual tokens. Per-query cost is independent of video length.
+                </p>
+            </div>
+        </div>
+    </section>
 
     <!-- Abstract Section -->
     <section id="abstract" class="section">
@@ -97,40 +109,42 @@
         <div class="container">
             <h2 class="section-title">Methodology</h2>
             <div class="glass-card">
-                <div class="arch-steps" style="margin-bottom: 3rem;">
+                <div class="arch-steps">
                     <div class="arch-step">
                         <div class="step-num">1</div>
                         <div class="step-content">
-                            <h4>Video Encoder</h4>
-                            <p>The input video sequence is processed frame-by-frame by a frozen vision-language model encoder (e.g., SmolVLM2's vision tower), extracting rich visual and temporal features across all frames.</p>
+                            <h4>Problem Formulation</h4>
+                            <p>Let <i>v</i> denote a video, <i>i</i> an internalization instruction, <i>p</i> a downstream text prompt, and <i>y</i> the target response. We assume a frozen vision-language encoder <i>E</i>, a frozen answer model <i>F</i>, and a trainable hypernetwork <i>H</i><sub>&phi;</sub>. The answer model receives the text prompt <i>p</i> and the adapter &theta;(<i>v</i>), but not the video tokens. During training, only &phi; is updated; both <i>E</i> and <i>F</i> remain frozen.</p>
                         </div>
                     </div>
                     <div class="arch-step">
                         <div class="step-num">2</div>
                         <div class="step-content">
-                            <h4>Perceiver Latent Aggregation</h4>
-                            <p>A trainable Perceiver Resampler uses learnable query vectors to cross-attend to the frame encoder's outputs. This compresses the variable-length sequence of visual tokens into a fixed-size latent bottleneck, consolidating spatial and temporal contexts.</p>
+                            <h4>Video Encoder</h4>
+                            <p>We use a frozen SmolVLM2 model as the video encoder. Given a sampled video and the internalization instruction, we collect the text-side hidden states from each transformer layer. Keeping the layer dimension allows the hypernetwork to generate layer-indexed adapters instead of using a single pooled video vector for all layers.</p>
                         </div>
                     </div>
                     <div class="arch-step">
                         <div class="step-num">3</div>
                         <div class="step-content">
-                            <h4>Low-Rank Weight Synthesis</h4>
-                            <p>Layer-specific Multi-Layer Perceptron (MLP) projection heads process the latent bottleneck representation to directly synthesize low-rank adapter weights (A and B matrices) for the target VLM's projection layers. These weights are dynamically loaded into the model parameter space.</p>
+                            <h4>Perceiver Hypernetwork</h4>
+                            <p>The hypernetwork maps the video-conditioned hidden states into LoRA weights for selected linear modules of the frozen answer model. We use a Perceiver-style resampler architecture. A shared projection head maps each rank latent to the two LoRA factors, which are scaled by learned multipliers initialized to zero perturbation.</p>
                         </div>
                     </div>
                     <div class="arch-step">
                         <div class="step-num">4</div>
                         <div class="step-content">
-                            <h4>Zero-Visual-Token Querying</h4>
-                            <p>At inference time, the original video is completely discarded. The VLM answers arbitrary text queries about the video in a purely text-based context (<b>0 visual tokens</b>) using the synthesized weights. This completely eliminates visual attention overhead and context length bottlenecks.</p>
+                            <h4>Dynamic LoRA Injection</h4>
+                            <p>For a frozen linear layer, we use the standard LoRA factorization. Each example receives its own generated adapter, so the LoRA weights are conditioned on the input video rather than shared across all videos.</p>
                         </div>
                     </div>
-                </div>
-                
-                <div style="text-align: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
-                    <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; font-family: var(--font-heading); color: #1A202C;">System Architecture Overview</h3>
-                    <img src="Vid2LoRA-actual-animated.svg" alt="Vid2LoRA System Architecture" style="width: 100%; height: auto; max-width: 900px; border-radius: 8px; border: 1px solid var(--border-color); padding: 1rem; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div class="arch-step">
+                        <div class="step-num">5</div>
+                        <div class="step-content">
+                            <h4>Training Objective</h4>
+                            <p>We train the hypernetwork with teacher-forced cross-entropy over response tokens. The answer model receives only the downstream text prompt and the generated adapter during this loss computation, ensuring zero visual tokens in the context window.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
