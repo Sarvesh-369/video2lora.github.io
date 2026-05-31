@@ -586,6 +586,18 @@ tr:last-child td {
     border-color: var(--border-hover);
 }
 
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.025);
+    margin-bottom: 2rem;
+    transition: var(--transition-smooth);
+}
+
 .claims-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
