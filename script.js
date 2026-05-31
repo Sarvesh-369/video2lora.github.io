@@ -45,15 +45,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------------------------------
     const examples = [
         {
-            videoId: "media/benchmarks/carebench/v_00016568_0.mp4",
+            videoId: "media/benchmarks/carebench/v_00014063_0.mp4",
             question: "Describe the video in as much useful visual detail as possible. Include the main activity, visible people or objects, scene context, appearance, and any important visual details that help explain what is happening.",
-            reference: "The video depicts a man outdoors, watering plants in his garden. He is dressed in a light blue T-shirt and checkered shorts, bent over as he holds a black watering can, gently pouring water into a potted plant by the wall. The surrounding environment is a quintessential garden, featuring a red wooden fence adorned with climbing vines. The lush greenery of the grass adds to the inviting atmosphere, and in the background, a hanging tire sways gently in the air. The man maintains his bent posture, grasping the handle of the watering can with his left hand, while the other side of the can is also held by another hand. From a glimpse of clothing and feet visible in the video, it appears that a small child is standing to the left of the man, helping him with the watering task. They begin by slightly tilting the watering can to minimize the flow of water, then they water the edges of the plant in the pot in a circular motion. Afterward, they adjust the angle of the can to increase the flow, directing water onto the plants beside the pot. Finally, the man raises the can, preparing to straighten up and move away.The camera angle captures the scene from slightly behind and to the left of the man, providing a clear view of his watering actions and the state of the plants. The overall ambiance is vibrant and full of life, showcasing a tranquil moment of tending to the garden that evokes a sense of nature and relaxation.",
-            basePrediction: "A man wearing a blue shirt and plaid shorts is watering plants in a garden. He is using a black watering can to pour water onto the plants. The garden is surrounded by a red fence and there are other plants and trees in the background.",
+            reference: "This video depicts a scene of a man lighting a pipe with a lighter. The man in the video is smoking a pipe held in his mouth, supported by his left hand, while his right hand grips the lighter. His right forearm features a large black tattoo. He has short, thick hair that is a deep brown color and is dressed in a loose-fitting black tank top. He is seated next to a window, which has a wooden frame and blue curtains, with a brick wall behind him and a wooden door on the right. The door has a square pattern, adorned with silver hinges and a doorknob. In the video, he first ignites the lighter with his right hand and then brings the flame to the pipe, holding it in that position for several seconds. Throughout this time, his left hand remains steady on the pipe, and his gaze is fixed intently on it, ensuring that the pipe is fully lit before setting the lighter down. He then continues to hold the pipe with his left hand and begins to smoke. The video is shot from the front, clearly illustrating how relaxed he is while smoking at home.",
+            basePrediction: "A young man with tattoos on his arms is sitting in a room with a brick wall and a wooden door. He is holding a lighter and a piece of paper. He is blowing on the paper and then putting it in his mouth.",
             baseEm: 0,
-            baseF1: "0.6500",
-            loraPrediction: "A man wearing a light blue shirt and plaid shorts is watering a plant in a garden. He is using a black watering can to pour water onto the plant. The garden is surrounded by a red fence and there are other plants in the background.",
+            baseF1: "0.3200",
+            loraPrediction: "A person is smoking a cigarette in a room with a brick wall and a wooden door. The person is wearing a black tank top and has tattoos on their arms. They are holding the cigarette in their right hand and using their left hand to light it with a lighter.",
             loraEm: 0,
-            loraF1: "0.7800",
+            loraF1: "0.5600",
             source: "CaReBench: Caption"
         },
         {
