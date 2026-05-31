@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video2LoRA: Parametric Video Internalization for Vision-Language Models</title>
+    <meta name="description" content="Video2LoRA turns video context into LoRA weights for a frozen SmolVLM base model in a single forward pass, enabling zero-visual-token inference with up to 1500x token reduction and 6x-80x speedup.">
+    <link rel="stylesheet" href="style.css?v=8">
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1>Video2LoRA: Parametric Video Internalization<br>for Vision-Language Models</h1>
+            <p class="hero-subtitle">Train a hypernetwork to convert video context into dynamic LoRA weights, enabling zero-visual-token video QA and captioning.</p>
+            
+            <div class="authors">
+                <a class="author" href="#">Manan Suri<sup>†</sup></a>
+                <a class="author" href="#">Sarvesh Baskar</a>
+                <a class="author" href="#">Dinesh Manocha<sup>†</sup></a>
+            </div>
+            
+            <div class="affiliations">
+                <p><sup>†</sup>University of Maryland, College Park</p>
+                <p style="margin-top: 0.5rem; font-family: monospace; color: var(--text-muted);">manans@umd.edu &nbsp;&nbsp;&nbsp;&nbsp; baskarsarvesh@gmail.com</p>
+            </div>
+            
+            <div class="btn-group">
+                <a href="Video2LoRA_ARR_May_2026.pdf" target="_blank" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Read Paper PDF
+                </a>
+                <a href="https://github.com/MananSuri27/vid2lora" target="_blank" class="btn btn-outline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    Code Repository
+                </a>
+                <a href="https://huggingface.co/MananSuri27/video2lora-smolvlm2-2.2b-best-ce" target="_blank" class="btn btn-outline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    HF Checkpoint
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sticky Navigation Menu -->
+    <nav class="nav-menu">
+        <div class="container nav-container">
+            <a href="#abstract" class="nav-link active">Abstract</a>
+            <a href="#methodology" class="nav-link">Methodology</a>
+            <a href="#results" class="nav-link">Results</a>
+            <a href="#qualitative" class="nav-link">Qualitative</a>
+            <a href="#bibtex" class="nav-link">BibTeX</a>
+        </div>
+    </nav>
+
+    <!-- Abstract Section -->
+    <section id="abstract" class="section">
+        <div class="container">
+            <h2 class="section-title">Abstract</h2>
+            <div class="glass-card">
+                <p class="abstract-content">
+                    Processing video in vision-language models (VLMs) is extremely expensive: each frame occupies hundreds of tokens, and inference cost scales with every frame and every repeated query. We introduce <strong>Video2LoRA</strong>, a method for parametric video internalization. A perceiver hypernetwork reads the intermediate representations produced layer-by-layer as a frozen VLM encodes a video, and generates a Low-Rank Adaptation (LoRA) adapter in a single forward pass. Unlike standard LoRA fine-tuning, which requires iterative gradient updates, Video2LoRA predicts these weights directly from the video. 
+                </p>
+                <p class="abstract-content" style="margin-top: 1.25rem;">
+                    Trained for SmolVLM2 500M and 2.2B on video summarization and captioning, Video2LoRA enables the same frozen VLM to answer queries from the adapter alone, with <strong>zero visual tokens</strong> in its context window at query time. Video2LoRA is statistically non-inferior and equivalent to direct video-in-context inference across all five captioning benchmarks at both model scales, and across seven of eight video QA benchmarks. While direct video-in-context inference often degenerates above 100 frames, Video2LoRA remains stable up to 1,024 frames, reducing answer-time token load by up to <strong>1,500×</strong> and query Time-to-First-Token (TTFT) by <strong>6–80×</strong>.
+                </p>
+            </div>
+            
+            <!-- Metrics Cards Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-val">1500×</div>
+                    <div class="metric-label">Token Reduction</div>
+                    <div class="metric-desc">Visual tokens in VLM prompt context are reduced to zero.</div>
+                </div>
+                <div class="metric-card speedup">
+                    <div class="metric-val">6x - 80x</div>
+                    <div class="metric-label">TTFT Speedup</div>
+                    <div class="metric-desc">Near-instantaneous time-to-first-token during queries.</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val">0</div>
+                    <div class="metric-label">Visual Tokens</div>
+                    <div class="metric-desc">Inference operates on text only, using parameterized video info.</div>
+                </div>
+                <div class="metric-card generalization">
+                    <div class="metric-val">1,024px</div>
+                    <div class="metric-label">Robust Scaling</div>
+                    <div class="metric-desc">Extrapolates stably up to 1024 frames and 1024px resolutions.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Methodology Section -->
+    <section id="methodology" class="section">
+        <div class="container">
+            <h2 class="section-title">Methodology</h2>
+            <div class="glass-card">
+                <div class="arch-steps" style="margin-bottom: 3rem;">
+                    <div class="arch-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h4>Multi-Frame Visual Encoding</h4>
+                            <p>The input video sequence is processed frame-by-frame by a frozen vision-language model encoder (e.g., SmolVLM2's vision tower), extracting rich visual and temporal features across all frames.</p>
+                        </div>
+                    </div>
+                    <div class="arch-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h4>Perceiver Latent Aggregation</h4>
+                            <p>A trainable Perceiver Resampler uses learnable query vectors to cross-attend to the frame encoder's outputs. This compresses the variable-length sequence of visual tokens into a fixed-size latent bottleneck, consolidating spatial and temporal contexts.</p>
+                        </div>
+                    </div>
+                    <div class="arch-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h4>Low-Rank Weight Synthesis</h4>
+                            <p>Layer-specific Multi-Layer Perceptron (MLP) projection heads process the latent bottleneck representation to directly synthesize low-rank adapter weights (A and B matrices) for the target VLM's projection layers. These weights are dynamically loaded into the model parameter space.</p>
+                        </div>
+                    </div>
+                    <div class="arch-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h4>Zero-Visual-Token Querying</h4>
+                            <p>At inference time, the original video is completely discarded. The VLM answers arbitrary text queries about the video in a purely text-based context (<b>0 visual tokens</b>) using the synthesized weights. This completely eliminates visual attention overhead and context length bottlenecks.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; font-family: var(--font-heading); color: #1A202C;">System Architecture Overview</h3>
+                    <img src="Vid2LoRA-actual-animated.svg" alt="Vid2LoRA System Architecture" style="width: 100%; height: auto; max-width: 900px; border-radius: 8px; border: 1px solid var(--border-color); padding: 1rem; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benchmark Results Section -->
+    <section id="results" class="section">
+        <div class="container">
+            <h2 class="section-title">Benchmark Performance</h2>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: -1.5rem auto 2.5rem;">
+                Video2LoRA is statistically equivalent or non-inferior to direct video encoding across standard benchmarks, despite storing zero visual frames in the VLM's context at query time.
+            </p>
+              <div class="tabs-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="table-1">Table 1: Captioning Benchmarks</button>
+                    <button class="tab-btn" data-tab="table-4">Table 4: Video QA Benchmarks</button>
+                    <button class="tab-btn" data-tab="table-2">Table 2: VDC Styles</button>
+                    <button class="tab-btn" data-tab="table-3">Table 3: CaReBench Subsets</button>
+                </div>
+                
+                <!-- Table 1: Captioning Benchmarks -->
+                <div id="table-1" class="tab-content active">
+                    <h3 style="margin: 1.5rem 0 0.5rem; font-size:1.25rem; text-align: center;">Table 1: Comparison across Captioning Benchmarks</h3>
+                    <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 800px; margin: 0.5rem auto 1.5rem;">
+                        Comparison of the base model with video and VIDEO2LORA generated adapters, across captioning benchmarks using LLM Judge scores and Token F1. We report mean scores, the paired difference &Delta; (V2L &minus; Base), 95% confidence intervals, and the statistical equivalence (Eq) and non-inferiority (NI) criteria.
+                    </p>
+                    
+                    <h4 style="margin: 1.5rem 0 0.5rem; font-size:1.1rem; color: #1E293B;">1. LLM Judge Score (Rescaled [0, 1])</h4>
+                    <div class="table-wrapper" style="margin-bottom: 2rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; vertical-align: middle;">Benchmark</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 500M</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 2.2B</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>ActivityNet Captions</strong></td>
+                                    <td style="text-align: center;">0.428</td>
+                                    <td style="text-align: center;">0.356</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.072</td>
+                                    <td style="text-align: center;">[-0.104, -0.041]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.576</td>
+                                    <td style="text-align: center;">0.492</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.084</td>
+                                    <td style="text-align: center;">[-0.113, -0.057]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PLM-RDCap</strong></td>
+                                    <td style="text-align: center;">0.308</td>
+                                    <td style="text-align: center;">0.263</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.045</td>
+                                    <td style="text-align: center;">[-0.069, -0.021]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.326</td>
+                                    <td style="text-align: center;">0.316</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.010</td>
+                                    <td style="text-align: center;">[-0.032, +0.012]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PLM-RCap</strong></td>
+                                    <td style="text-align: center;">0.252</td>
+                                    <td style="text-align: center;">0.242</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.011</td>
+                                    <td style="text-align: center;">[-0.031, +0.009]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.270</td>
+                                    <td style="text-align: center;">0.287</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.017</td>
+                                    <td style="text-align: center;">[+0.001, +0.034]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>VDC (aggregate)</strong></td>
+                                    <td style="text-align: center;">0.515</td>
+                                    <td style="text-align: center;">0.406</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.108</td>
+                                    <td style="text-align: center;">[-0.118, -0.098]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.539</td>
+                                    <td style="text-align: center;">0.511</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.028</td>
+                                    <td style="text-align: center;">[-0.037, -0.019]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CaReBench</strong></td>
+                                    <td style="text-align: center;">0.334</td>
+                                    <td style="text-align: center;">0.278</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.056</td>
+                                    <td style="text-align: center;">[-0.067, -0.045]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.437</td>
+                                    <td style="text-align: center;">0.369</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.068</td>
+                                    <td style="text-align: center;">[-0.078, -0.058]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr style="background: #F8FAFC; font-weight: bold; border-top: 2px solid #1A202C;">
+                                    <td>Average</td>
+                                    <td style="text-align: center;">0.367</td>
+                                    <td style="text-align: center;">0.309</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.058</td>
+                                    <td style="text-align: center;">[-0.078, -0.039]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.430</td>
+                                    <td style="text-align: center;">0.395</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.035</td>
+                                    <td style="text-align: center;">[-0.052, -0.018]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h4 style="margin: 1.5rem 0 0.5rem; font-size:1.1rem; color: #1E293B;">2. Token F1 Score</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; vertical-align: middle;">Benchmark</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 500M</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 2.2B</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>ActivityNet Captions</strong></td>
+                                    <td style="text-align: center;">0.236</td>
+                                    <td style="text-align: center;">0.243</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.007</td>
+                                    <td style="text-align: center;">[+0.002, +0.012]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.263</td>
+                                    <td style="text-align: center;">0.256</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.007</td>
+                                    <td style="text-align: center;">[-0.012, -0.002]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PLM-RDCap</strong></td>
+                                    <td style="text-align: center;">0.189</td>
+                                    <td style="text-align: center;">0.198</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.009</td>
+                                    <td style="text-align: center;">[+0.005, +0.013]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.198</td>
+                                    <td style="text-align: center;">0.207</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.009</td>
+                                    <td style="text-align: center;">[+0.005, +0.013]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PLM-RCap</strong></td>
+                                    <td style="text-align: center;">0.177</td>
+                                    <td style="text-align: center;">0.203</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.026</td>
+                                    <td style="text-align: center;">[+0.021, +0.031]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.199</td>
+                                    <td style="text-align: center;">0.204</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.005</td>
+                                    <td style="text-align: center;">[+0.001, +0.010]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>VDC (aggregate)</strong></td>
+                                    <td style="text-align: center;">0.315</td>
+                                    <td style="text-align: center;">0.288</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.027</td>
+                                    <td style="text-align: center;">[-0.030, -0.025]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.297</td>
+                                    <td style="text-align: center;">0.304</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.007</td>
+                                    <td style="text-align: center;">[+0.003, +0.010]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CaReBench</strong></td>
+                                    <td style="text-align: center;">0.295</td>
+                                    <td style="text-align: center;">0.275</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.020</td>
+                                    <td style="text-align: center;">[-0.023, -0.017]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.292</td>
+                                    <td style="text-align: center;">0.279</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.013</td>
+                                    <td style="text-align: center;">[-0.015, -0.010]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr style="background: #F8FAFC; font-weight: bold; border-top: 2px solid #1A202C;">
+                                    <td>Average</td>
+                                    <td style="text-align: center;">0.243</td>
+                                    <td style="text-align: center;">0.242</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.001</td>
+                                    <td style="text-align: center;">[-0.005, +0.003]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.250</td>
+                                    <td style="text-align: center;">0.250</td>
+                                    <td style="text-align: center; color: #718096;">0.000</td>
+                                    <td style="text-align: center;">[-0.004, +0.004]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Table 4: Video QA Benchmarks -->
+                <div id="table-4" class="tab-content">
+                    <h3 style="margin: 1.5rem 0 0.5rem; font-size:1.25rem; text-align: center;">Table 4: Comparison across Video Question Answering Benchmarks</h3>
+                    <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 800px; margin: 0.5rem auto 1.5rem;">
+                        Comparison of the base model with video and VIDEO2LORA generated adapters, across video question answering benchmarks using LLM Judge scores and Token F1. We report mean scores, the paired difference &Delta; (V2L &minus; Base), 95% confidence intervals, and the statistical equivalence (Eq) and non-inferiority (NI) criteria.
+                    </p>
+                    
+                    <h4 style="margin: 1.5rem 0 0.5rem; font-size:1.1rem; color: #1E293B;">1. LLM Judge Score (Rescaled [0, 1])</h4>
+                    <div class="table-wrapper" style="margin-bottom: 2rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; vertical-align: middle;">Benchmark</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 500M</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 2.2B</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>NExT-QA (open)</strong></td>
+                                    <td style="text-align: center;">0.501</td>
+                                    <td style="text-align: center;">0.547</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.046</td>
+                                    <td style="text-align: center;">[+0.007, +0.084]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.597</td>
+                                    <td style="text-align: center;">0.610</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.013</td>
+                                    <td style="text-align: center;">[-0.022, +0.048]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ActivityNet-QA</strong></td>
+                                    <td style="text-align: center;">0.524</td>
+                                    <td style="text-align: center;">0.541</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.016</td>
+                                    <td style="text-align: center;">[-0.031, +0.064]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.627</td>
+                                    <td style="text-align: center;">0.531</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.096</td>
+                                    <td style="text-align: center;">[-0.144, -0.049]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PLM-SGQA</strong></td>
+                                    <td style="text-align: center;">0.390</td>
+                                    <td style="text-align: center;">0.317</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.074</td>
+                                    <td style="text-align: center;">[-0.113, -0.034]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.493</td>
+                                    <td style="text-align: center;">0.295</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.198</td>
+                                    <td style="text-align: center;">[-0.236, -0.161]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>VidCapBench</strong></td>
+                                    <td style="text-align: center;">0.502</td>
+                                    <td style="text-align: center;">0.451</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.050</td>
+                                    <td style="text-align: center;">[-0.071, -0.030]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.551</td>
+                                    <td style="text-align: center;">0.475</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.076</td>
+                                    <td style="text-align: center;">[-0.096, -0.055]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr style="background: #F8FAFC; font-weight: bold; border-top: 2px solid #1A202C;">
+                                    <td>Average</td>
+                                    <td style="text-align: center;">0.487</td>
+                                    <td style="text-align: center;">0.460</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.027</td>
+                                    <td style="text-align: center;">[-0.043, -0.011]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.562</td>
+                                    <td style="text-align: center;">0.477</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.085</td>
+                                    <td style="text-align: center;">[-0.101, -0.069]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h4 style="margin: 1.5rem 0 0.5rem; font-size:1.1rem; color: #1E293B;">2. Token F1 Score</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; vertical-align: middle;">Benchmark</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 500M</th>
+                                    <th colspan="6" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 2.2B</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">&Delta;</th>
+                                    <th style="text-align: center;">95% CI</th>
+                                    <th style="text-align: center;">Eq</th>
+                                    <th style="text-align: center;">NI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>NExT-QA (open)</strong></td>
+                                    <td style="text-align: center;">0.129</td>
+                                    <td style="text-align: center;">0.068</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.061</td>
+                                    <td style="text-align: center;">[-0.076, -0.046]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center;">0.140</td>
+                                    <td style="text-align: center;">0.076</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.063</td>
+                                    <td style="text-align: center;">[-0.079, -0.048]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ActivityNet-QA</strong></td>
+                                    <td style="text-align: center;">0.197</td>
+                                    <td style="text-align: center;">0.023</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.174</td>
+                                    <td style="text-align: center;">[-0.199, -0.149]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center;">0.149</td>
+                                    <td style="text-align: center;">0.013</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.136</td>
+                                    <td style="text-align: center;">[-0.156, -0.117]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PLM-SGQA</strong></td>
+                                    <td style="text-align: center;">0.081</td>
+                                    <td style="text-align: center;">0.225</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.145</td>
+                                    <td style="text-align: center;">[+0.131, +0.158]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.092</td>
+                                    <td style="text-align: center;">0.203</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.111</td>
+                                    <td style="text-align: center;">[+0.098, +0.124]</td>
+                                    <td style="text-align: center; color: var(--text-muted);">&ndash;</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>VidCapBench</strong></td>
+                                    <td style="text-align: center;">0.216</td>
+                                    <td style="text-align: center;">0.209</td>
+                                    <td style="text-align: center; color: #EF4444; font-weight: 500;">-0.007</td>
+                                    <td style="text-align: center;">[-0.019, +0.004]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.196</td>
+                                    <td style="text-align: center;">0.218</td>
+                                    <td style="text-align: center; color: #047857; font-weight: 600;">+0.022</td>
+                                    <td style="text-align: center;">[+0.010, +0.033]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                                <tr style="background: #F8FAFC; font-weight: bold; border-top: 2px solid #1A202C;">
+                                    <td>Average</td>
+                                    <td style="text-align: center;">0.156</td>
+                                    <td style="text-align: center;">0.131</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.024</td>
+                                    <td style="text-align: center;">[-0.041, -0.008]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;">0.144</td>
+                                    <td style="text-align: center;">0.128</td>
+                                    <td style="text-align: center; color: #EF4444;">-0.017</td>
+                                    <td style="text-align: center;">[-0.032, -0.002]</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                    <td style="text-align: center;" class="equivalence-pass">Y</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Table 2: VDC Styles -->
+                <div id="table-2" class="tab-content">
+                    <h3 style="margin: 1.5rem 0 0.5rem; font-size:1.25rem; text-align: center;">Table 2: VDC Results Broken Down by Caption Style</h3>
+                    <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 800px; margin: 0.5rem auto 1.5rem;">
+                        Fine-grained evaluation on the Video Description Corpus (VDC) across various captioning styles, comparing the performance of base models and Video2LoRA generated adapters.
+                    </p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; vertical-align: middle;">Subset / Caption Style</th>
+                                    <th colspan="2" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 500M</th>
+                                    <th colspan="2" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 2.2B</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Short caption</strong></td>
+                                    <td style="text-align: center;">0.629</td>
+                                    <td style="text-align: center;">0.535 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.094)</span></td>
+                                    <td style="text-align: center;">0.556</td>
+                                    <td style="text-align: center;">0.579 <span style="color: #047857; font-weight: 600; font-size: 0.85rem; margin-left: 0.25rem;">(+0.022)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Detailed caption</strong></td>
+                                    <td style="text-align: center;">0.476</td>
+                                    <td style="text-align: center;">0.401 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.074)</span></td>
+                                    <td style="text-align: center;">0.526</td>
+                                    <td style="text-align: center;">0.463 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.063)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Camera</strong></td>
+                                    <td style="text-align: center;">0.310</td>
+                                    <td style="text-align: center;">0.131 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.178)</span></td>
+                                    <td style="text-align: center;">0.478</td>
+                                    <td style="text-align: center;">0.392 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.085)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Background</strong></td>
+                                    <td style="text-align: center;">0.642</td>
+                                    <td style="text-align: center;">0.523 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.117)</span></td>
+                                    <td style="text-align: center;">0.588</td>
+                                    <td style="text-align: center;">0.606 <span style="color: #047857; font-weight: 600; font-size: 0.85rem; margin-left: 0.25rem;">(+0.018)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Main object</strong></td>
+                                    <td style="text-align: center;">0.517</td>
+                                    <td style="text-align: center;">0.442 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.075)</span></td>
+                                    <td style="text-align: center;">0.546</td>
+                                    <td style="text-align: center;">0.514 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.032)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Table 3: CaReBench Subsets -->
+                <div id="table-3" class="tab-content">
+                    <h3 style="margin: 1.5rem 0 0.5rem; font-size:1.25rem; text-align: center;">Table 3: CaReBench Results Broken Down by Subset</h3>
+                    <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 800px; margin: 0.5rem auto 1.5rem;">
+                        Fine-grained evaluation across CaReBench subsets (semantic dimensions), comparing base models and Video2LoRA generated adapters.
+                    </p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; vertical-align: middle;">Subset / Semantic Dimension</th>
+                                    <th colspan="2" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 500M</th>
+                                    <th colspan="2" style="text-align: center; border-bottom: 1px solid #1A202C;">SmolVLM 2.2B</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                    <th style="text-align: center;">Base</th>
+                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Caption</strong></td>
+                                    <td style="text-align: center;">0.418</td>
+                                    <td style="text-align: center;">0.324 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.094)</span></td>
+                                    <td style="text-align: center;">0.465</td>
+                                    <td style="text-align: center;">0.400 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.065)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Events</strong></td>
+                                    <td style="text-align: center;">0.201</td>
+                                    <td style="text-align: center;">0.169 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.032)</span></td>
+                                    <td style="text-align: center;">0.340</td>
+                                    <td style="text-align: center;">0.267 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.073)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Objects</strong></td>
+                                    <td style="text-align: center;">0.368</td>
+                                    <td style="text-align: center;">0.327 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.043)</span></td>
+                                    <td style="text-align: center;">0.457</td>
+                                    <td style="text-align: center;">0.392 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.065)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Spatial caption</strong></td>
+                                    <td style="text-align: center;">0.424</td>
+                                    <td style="text-align: center;">0.329 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.095)</span></td>
+                                    <td style="text-align: center;">0.519</td>
+                                    <td style="text-align: center;">0.426 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.094)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Temporal caption</strong></td>
+                                    <td style="text-align: center;">0.260</td>
+                                    <td style="text-align: center;">0.242 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.018)</span></td>
+                                    <td style="text-align: center;">0.404</td>
+                                    <td style="text-align: center;">0.360 <span style="color: #EF4444; font-size: 0.85rem; margin-left: 0.25rem;">(-0.045)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Qualitative Explorer Section -->
+    <section id="qualitative" class="section">
+        <div class="container">
+            <h2 class="section-title">Qualitative Examples</h2>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: -1.5rem auto 2.5rem;">
+                Browse real evaluation outputs comparing the Baseline (prompted with direct video-in-context) versus Video2LoRA (frozen VLM with no video tokens, answering from parameters).
+            </p>
+            
+            <div class="explorer-widget">
+                <div class="explorer-header">
+                    <div class="explorer-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                        <span id="example-source">MSVD-QA</span>
+                    </div>
+                    <div class="explorer-nav">
+                        <button id="prev-example" class="nav-btn" aria-label="Previous Example">&larr;</button>
+                        <span id="example-index-display" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 32px; padding: 0 0.5rem;">Example 1 of 6</span>
+                        <button id="next-example" class="nav-btn" aria-label="Next Example">&rarr;</button>
+                    </div>
+                </div>
+                
+                <div class="explorer-body">
+                    <div class="explorer-video-column" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 720px; margin: 0 auto;">
+                        <div class="explorer-video-placeholder" style="padding: 0; background: #000; height: auto; min-height: unset; border: none; margin-bottom: 0;">
+                            <video id="video-preview-local" style="width: 100%; max-height: 480px; border-radius: 6px; display: block; background: #000;" controls loop muted autoplay playsinline></video>
+                        </div>
+                    </div>
+                    
+                    <div class="explorer-content" style="width: 100%; max-width: 720px; margin: 0 auto;">
+                        <div class="chat-bubble bubble-question">
+                            <div class="bubble-label">Question Prompt</div>
+                            <div id="example-question" style="font-weight: 500;">Loading question...</div>
+                        </div>
+                        
+                        <div class="chat-bubble bubble-reference">
+                            <div class="bubble-label">Reference Target (Ground Truth)</div>
+                            <div id="example-reference" style="font-weight: 600;">Loading ground truth...</div>
+                        </div>
+                        
+                        <div class="comparison-box">
+                            <div class="comp-column base">
+                                <div class="comp-name">Base Model (Video Context)</div>
+                                <div id="base-prediction" class="comp-response">Loading...</div>
+                                <div class="comp-stat"><span id="base-em">EM: 0</span> &nbsp;|&nbsp; <span id="base-f1">F1: 0.0000</span></div>
+                            </div>
+                            <div class="comp-column lora">
+                                <div class="comp-name">Video2LoRA (Zero Video Tokens)</div>
+                                <div id="lora-prediction" class="comp-response">Loading...</div>
+                                <div class="comp-stat" style="color: var(--accent);"><span id="lora-em">EM: 1</span> &nbsp;|&nbsp; <span id="lora-f1">F1: 1.0000</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BibTeX Citation Section -->
+    <section id="bibtex" class="section">
+        <div class="container">
+            <h2 class="section-title">BibTeX Citation</h2>
+            <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+                <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.95rem;">
+                    If you find Video2LoRA useful for your research, please cite our submission:
+                </p>
+                <div class="bibtex-box">
+                    <button id="copy-bibtex" class="copy-btn">Copy</button>
+                    <code id="bibtex-raw" class="bibtex-code">@article{suri2026video2lora,
+  title={Video2LoRA: Parametric Video Internalization for Vision-Language Models},
+  author={Suri, Manan and Baskar, Sarvesh and Manocha, Dinesh},
+  journal={arXiv preprint arXiv:2605.xxxxx},
+  year={2026}
+}</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Video2LoRA Project. All rights reserved.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">Built with Vanilla HTML, CSS, and JS. Designed for academic and performance excellence.</p>
+        </div>
+    </footer>
+
+    <script src="script.js?v=8"></script>
+</body>
+</html>

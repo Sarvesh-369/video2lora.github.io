@@ -1,0 +1,196 @@
+{
+  "groups": [
+    {
+      "dataset": "carebench",
+      "examples": [
+        {
+          "sample_id": "v_00003192_0-73-caption",
+          "row_id": "73",
+          "video_id": "v_00003192_0",
+          "video_path_expected": "data/benchmarks/CaReBench/videos/v_00003192_0.mp4",
+          "source_video": "v_00003192_0.mp4",
+          "selection_labels": [
+            "good, good"
+          ],
+          "category": "Personal Care",
+          "subcategory": "tie_shoelaces",
+          "target_column": "caption"
+        }
+      ]
+    },
+    {
+      "dataset": "carebench",
+      "examples": [
+        {
+          "sample_id": "v_00016582_0-104-events",
+          "row_id": "104",
+          "video_id": "v_00016582_0",
+          "video_path_expected": "data/benchmarks/CaReBench/videos/v_00016582_0.mp4",
+          "source_video": "v_00016582_0.mp4",
+          "selection_labels": [
+            "good, good"
+          ],
+          "category": "Household Activities",
+          "subcategory": "water_plants",
+          "target_column": "events"
+        }
+      ]
+    },
+    {
+      "dataset": "carebench",
+      "examples": [
+        {
+          "sample_id": "v_00003192_0-73-objects",
+          "row_id": "73",
+          "video_id": "v_00003192_0",
+          "video_path_expected": "data/benchmarks/CaReBench/videos/v_00003192_0.mp4",
+          "source_video": "v_00003192_0.mp4",
+          "selection_labels": [
+            "good, good"
+          ],
+          "category": "Personal Care",
+          "subcategory": "tie_shoelaces",
+          "target_column": "objects"
+        }
+      ]
+    },
+    {
+      "dataset": "carebench",
+      "examples": [
+        {
+          "sample_id": "v_00003192_0-73-spatial_caption",
+          "row_id": "73",
+          "video_id": "v_00003192_0",
+          "video_path_expected": "data/benchmarks/CaReBench/videos/v_00003192_0.mp4",
+          "source_video": "v_00003192_0.mp4",
+          "selection_labels": [
+            "good, good"
+          ],
+          "category": "Personal Care",
+          "subcategory": "tie_shoelaces",
+          "target_column": "spatial_caption"
+        }
+      ]
+    },
+    {
+      "dataset": "plm",
+      "examples": [
+        {
+          "sample_id": "1",
+          "row_id": "1",
+          "video_id": "97732532ef49f985_422_454",
+          "video_path_expected": "data/benchmarks/PLM-VideoBench/videos/sgqa/97732532ef49f985_422_454.mp4",
+          "source_video": "97732532ef49f985_422_454.mp4",
+          "selection_labels": [
+            "good, good"
+          ]
+        },
+        {
+          "sample_id": "9",
+          "row_id": "9",
+          "video_id": "b5bdb7f254cb1727_369_400",
+          "video_path_expected": "data/benchmarks/PLM-VideoBench/videos/sgqa/b5bdb7f254cb1727_369_400.mp4",
+          "source_video": "b5bdb7f254cb1727_369_400.mp4",
+          "selection_labels": [
+            "good, good"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "vidcapbench",
+      "examples": [
+        {
+          "sample_id": "VidCapBench-AE_QA.jsonl-Tarsier_20-0-4",
+          "row_id": "0",
+          "video_id": "Tarsier_20",
+          "video_path_expected": "data/benchmarks/VidCapBench/videos/Tarsier_20.mp4",
+          "source_video": "/pfs/Datasets/VidCapBench/videos/Tarsier_20.mp4",
+          "selection_labels": [
+            "bad, good"
+          ],
+          "source_file": "VidCapBench-AE_QA.jsonl",
+          "qa_index": 4,
+          "primary_category": "video content",
+          "sub_category": "background"
+        }
+      ]
+    },
+    {
+      "dataset": "vidcapbench",
+      "examples": [
+        {
+          "sample_id": "VidCapBench-AE_QA.jsonl-Tarsier_20-0-8",
+          "row_id": "0",
+          "video_id": "Tarsier_20",
+          "video_path_expected": "data/benchmarks/VidCapBench/videos/Tarsier_20.mp4",
+          "source_video": "/pfs/Datasets/VidCapBench/videos/Tarsier_20.mp4",
+          "selection_labels": [
+            "bad, bad"
+          ],
+          "source_file": "VidCapBench-AE_QA.jsonl",
+          "qa_index": 8,
+          "primary_category": "video aesthetics",
+          "sub_category": "cinematography"
+        }
+      ]
+    },
+    {
+      "dataset": "vidcapbench",
+      "examples": [
+        {
+          "sample_id": "VidCapBench-AE_QA.jsonl-132065802449-45-15",
+          "row_id": "45",
+          "video_id": "132065802449",
+          "video_path_expected": "data/benchmarks/VidCapBench/videos/132065802449.mp4",
+          "source_video": "/pfs/Datasets/VidCapBench/videos/132065802449.mp4",
+          "selection_labels": [
+            "good, bad"
+          ],
+          "source_file": "VidCapBench-AE_QA.jsonl",
+          "qa_index": 15,
+          "primary_category": "video aesthetics",
+          "sub_category": "color"
+        }
+      ]
+    },
+    {
+      "dataset": "vidcapbench",
+      "examples": [
+        {
+          "sample_id": "VidCapBench-AE_QA.jsonl-Tarsier_20-0-14",
+          "row_id": "0",
+          "video_id": "Tarsier_20",
+          "video_path_expected": "data/benchmarks/VidCapBench/videos/Tarsier_20.mp4",
+          "source_video": "/pfs/Datasets/VidCapBench/videos/Tarsier_20.mp4",
+          "selection_labels": [
+            "bad, bad"
+          ],
+          "source_file": "VidCapBench-AE_QA.jsonl",
+          "qa_index": 14,
+          "primary_category": "physical laws",
+          "sub_category": "counter intuitive"
+        }
+      ]
+    },
+    {
+      "dataset": "vidcapbench",
+      "examples": [
+        {
+          "sample_id": "VidCapBench-AE_QA.jsonl-Tarsier_20-0-13",
+          "row_id": "0",
+          "video_id": "Tarsier_20",
+          "video_path_expected": "data/benchmarks/VidCapBench/videos/Tarsier_20.mp4",
+          "source_video": "/pfs/Datasets/VidCapBench/videos/Tarsier_20.mp4",
+          "selection_labels": [
+            "good, good"
+          ],
+          "source_file": "VidCapBench-AE_QA.jsonl",
+          "qa_index": 13,
+          "primary_category": "video aesthetics",
+          "sub_category": "lighting"
+        }
+      ]
+    }
+  ]
+}
