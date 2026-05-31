@@ -34,11 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const exQuestionDisplay = document.getElementById("example-question");
     const exReferenceDisplay = document.getElementById("example-reference");
     const basePredDisplay = document.getElementById("base-prediction");
-    const baseEmDisplay = document.getElementById("base-em");
-    const baseF1Display = document.getElementById("base-f1");
     const loraPredDisplay = document.getElementById("lora-prediction");
-    const loraEmDisplay = document.getElementById("lora-em");
-    const loraF1Display = document.getElementById("lora-f1");
 
     // ----------------------------------------------------
     // Qualitative Examples Database
@@ -127,12 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
         exReferenceDisplay.textContent = item.reference;
         
         basePredDisplay.textContent = item.basePrediction;
-        baseEmDisplay.textContent = `EM: ${item.baseEm}`;
-        baseF1Display.textContent = `F1: ${item.baseF1}`;
         
         loraPredDisplay.textContent = item.loraPrediction;
-        loraEmDisplay.textContent = `EM: ${item.loraEm}`;
-        loraF1Display.textContent = `F1: ${item.loraF1}`;
 
         const videoPlayer = document.getElementById("video-preview-local");
         if (videoPlayer) {

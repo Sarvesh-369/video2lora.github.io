@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video2LoRA: Parametric Video Internalization for Vision-Language Models</title>
     <meta name="description" content="Video2LoRA turns video context into LoRA weights for a frozen SmolVLM base model in a single forward pass, enabling zero-visual-token inference with up to 1500x token reduction and 6x-80x speedup.">
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
@@ -851,12 +851,10 @@
                             <div class="comp-column base">
                                 <div class="comp-name">Base Model (Video Context)</div>
                                 <div id="base-prediction" class="comp-response">Loading...</div>
-                                <div class="comp-stat"><span id="base-em">EM: 0</span> &nbsp;|&nbsp; <span id="base-f1">F1: 0.0000</span></div>
                             </div>
                             <div class="comp-column lora">
                                 <div class="comp-name">Video2LoRA (Zero Video Tokens)</div>
                                 <div id="lora-prediction" class="comp-response">Loading...</div>
-                                <div class="comp-stat" style="color: var(--accent);"><span id="lora-em">EM: 1</span> &nbsp;|&nbsp; <span id="lora-f1">F1: 1.0000</span></div>
                             </div>
                         </div>
                     </div>
@@ -894,6 +892,6 @@
         </div>
     </footer>
 
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=10"></script>
 </body>
 </html>
