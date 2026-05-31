@@ -45,16 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------------------------------
     const examples = [
         {
-            videoId: "media/benchmarks/other/flower.mp4",
-            question: "Describe the visible events in the video.",
-            reference: "A purple flower blooms rapidly over time.",
-            basePrediction: "The video shows a flower.",
+            videoId: "media/benchmarks/carebench/v_00016568_0.mp4",
+            question: "Describe the video in as much useful visual detail as possible. Include the main activity, visible people or objects, scene context, appearance, and any important visual details that help explain what is happening.",
+            reference: "The video depicts a man outdoors, watering plants in his garden. He is dressed in a light blue T-shirt and checkered shorts, bent over as he holds a black watering can, gently pouring water into a potted plant by the wall. The surrounding environment is a quintessential garden, featuring a red wooden fence adorned with climbing vines. The lush greenery of the grass adds to the inviting atmosphere, and in the background, a hanging tire sways gently in the air. The man maintains his bent posture, grasping the handle of the watering can with his left hand, while the other side of the can is also held by another hand. From a glimpse of clothing and feet visible in the video, it appears that a small child is standing to the left of the man, helping him with the watering task. They begin by slightly tilting the watering can to minimize the flow of water, then they water the edges of the plant in the pot in a circular motion. Afterward, they adjust the angle of the can to increase the flow, directing water onto the plants beside the pot. Finally, the man raises the can, preparing to straighten up and move away.The camera angle captures the scene from slightly behind and to the left of the man, providing a clear view of his watering actions and the state of the plants. The overall ambiance is vibrant and full of life, showcasing a tranquil moment of tending to the garden that evokes a sense of nature and relaxation.",
+            basePrediction: "A man wearing a blue shirt and plaid shorts is watering plants in a garden. He is using a black watering can to pour water onto the plants. The garden is surrounded by a red fence and there are other plants and trees in the background.",
             baseEm: 0,
-            baseF1: "0.6000",
-            loraPrediction: "A purple flower is shown blooming.",
+            baseF1: "0.6500",
+            loraPrediction: "A man wearing a light blue shirt and plaid shorts is watering a plant in a garden. He is using a black watering can to pour water onto the plant. The garden is surrounded by a red fence and there are other plants in the background.",
             loraEm: 0,
-            loraF1: "0.8500",
-            source: "Custom Demo"
+            loraF1: "0.7800",
+            source: "CaReBench: Caption"
         },
         {
             videoId: "media/benchmarks/carebench/v_00003192_0.mp4",
@@ -69,16 +69,16 @@ document.addEventListener("DOMContentLoaded", () => {
             source: "CaReBench: Objects"
         },
         {
-            videoId: "media/benchmarks/other/mov_bbb.mp4",
-            question: "What animals are in the video?",
-            reference: "A large bunny and a flying butterfly.",
-            basePrediction: "A rabbit is in a forest.",
-            baseEm: 0,
-            baseF1: "0.7500",
-            loraPrediction: "A large bunny interacts with a butterfly.",
-            loraEm: 0,
-            loraF1: "0.9500",
-            source: "Custom Demo"
+            videoId: "media/benchmarks/plm/f522598789220c70_122_155.mp4",
+            question: "Does this look like the same posture she's holding?",
+            reference: "Yes, it appears you're mirroring the same posture. Your alignment, knee bend, and spine position match the demonstration, indicating proper form and engagement of the targeted muscle groups for optimal effectiveness and safety.",
+            basePrediction: "Yes.",
+            baseEm: 1,
+            baseF1: "1.0000",
+            loraPrediction: "Yes, the woman is holding the same posture in the video.",
+            loraEm: 1,
+            loraF1: "1.0000",
+            source: "PLM-SGQA"
         },
         {
             videoId: "media/benchmarks/plm/b5bdb7f254cb1727_369_400.mp4",
