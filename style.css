@@ -767,3 +767,22 @@ footer {
         transform: translateY(0);
     }
 }
+
+/* Mobile Nav Fixes */
+@media (max-width: 600px) {
+    .nav-container {
+        gap: 1rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 0 1rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .nav-container::-webkit-scrollbar {
+        display: none;
+    }
+    .nav-link {
+        white-space: nowrap;
+    }
+}
