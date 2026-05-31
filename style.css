@@ -586,6 +586,13 @@ tr:last-child td {
     border-color: var(--border-hover);
 }
 
+.claims-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3.5rem;
+}
+
 .explorer-body {
     padding: 1.5rem;
     display: flex;
@@ -597,6 +604,10 @@ tr:last-child td {
 @media (max-width: 768px) {
     .explorer-body {
         grid-template-columns: 1fr;
+    }
+    .claims-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 }
 
