@@ -53,11 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
             source: "CaReBench: Caption"
         },
         {
-            videoId: "media/benchmarks/carebench/v_00016582_0.mp4",
+            videoId: "media/benchmarks/carebench/v_00016555_0.mp4",
             question: "Describe the key visible events in chronological order. Include all important actions and changes you can observe, with enough detail to distinguish each event clearly.",
-            reference: "Man waters plants in garden; Man maintains consistent posture; Man waters pot of flowers; Man turns off nozzle; Man looks at the camera; Man prepares to bend down",
-            basePrediction: "A man wearing a white shirt and red shorts is watering plants in a garden. He is using a hose to water the plants. The garden has a lot of plants and flowers. The man is standing on a concrete path.",
-            loraPrediction: "A man is watering plants in a garden. He is wearing a white shirt and red shorts. He is using a hose to water the plants.",
+            reference: "Little boy watering plants outdoors; Using watering can to pour water into flower pot; Shifting camera angle from side view to rear view; Tapping edge of flower pot a few times; Setting down watering can",
+            basePrediction: "The video shows a young child in a white tank top and blue shorts standing in front of a garden with various potted plants. The child is holding a blue watering can and is seen pouring water into the potted plants.",
+            loraPrediction: "A young child is seen watering plants in a garden. The child is wearing a white tank top and blue shorts. The child is holding a blue watering can and is pouring water onto the plants.",
             source: "CaReBench: Events"
         },
         {
