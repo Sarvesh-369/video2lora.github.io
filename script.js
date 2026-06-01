@@ -53,16 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
             source: "CaReBench: Caption"
         },
         {
-            videoId: "media/benchmarks/carebench/v_00003192_0.mp4",
-            question: "Describe the important visible objects and entities in the video in as much useful detail as possible. Include their appearance, location, and role in the scene when visible.",
-            reference: "There is a young boy; There is a red and blue checkered shirt; There are red shorts; There is a staircase with wooden steps; There are white railings; There is a blue sneaker; There is a right sneaker.",
-            basePrediction: "A young boy is sitting on a wooden staircase, tying his blue sneakers. He is wearing a plaid shirt and red shorts. The boy is focused on tying the laces of his sneakers.",
-            baseEm: 0,
-            baseF1: "0.8800",
-            loraPrediction: "A young boy is sitting on a wooden staircase, wearing a plaid shirt and blue shorts. He is tying his shoelaces.",
-            loraEm: 0,
-            loraF1: "0.8500",
-            source: "CaReBench: Objects"
+            videoId: "media/benchmarks/carebench/v_00016582_0.mp4",
+            question: "Describe the key visible events in chronological order. Include all important actions and changes you can observe, with enough detail to distinguish each event clearly.",
+            reference: "Man waters plants in garden; Man maintains consistent posture; Man waters pot of flowers; Man turns off nozzle; Man looks at the camera; Man prepares to bend down",
+            basePrediction: "A man wearing a white shirt and red shorts is watering plants in a garden. He is using a hose to water the plants. The garden has a lot of plants and flowers. The man is standing on a concrete path.",
+            loraPrediction: "A man is watering plants in a garden. He is wearing a white shirt and red shorts. He is using a hose to water the plants.",
+            source: "CaReBench: Events"
         },
         {
             videoId: "media/benchmarks/plm/f522598789220c70_122_155.mp4",
