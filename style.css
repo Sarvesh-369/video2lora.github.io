@@ -188,16 +188,20 @@ h1, h2, h3, h4 {
 }
 
 .btn-huggingface {
-    background: linear-gradient(135deg, #FFD21E 0%, #FF9D00 100%);
-    color: #111827;
-    border: 1px solid #E2A400;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background-color: #24292f;
+    color: #ffffff;
+    border: 1px solid #24292f;
 }
 
 .btn-huggingface:hover {
-    background: linear-gradient(135deg, #FFE033 0%, #FFA81A 100%);
-    border-color: #D98200;
-    color: #111827;
+    background-color: #1f2328;
+    border-color: #1f2328;
+    color: #ffffff;
+}
+
+.btn-huggingface svg {
+    color: #FFD21E;
+    fill: #FFD21E;
 }
 
 /* Nav Menu */
