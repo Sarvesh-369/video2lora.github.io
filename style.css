@@ -164,6 +164,18 @@ h1, h2, h3, h4 {
     border-color: #102A43;
 }
 
+.btn-arxiv {
+    background-color: #B31B1B;
+    color: #ffffff;
+    border: 1px solid #B31B1B;
+}
+
+.btn-arxiv:hover {
+    background-color: #24292f;
+    border-color: #24292f;
+    color: #ffffff;
+}
+
 .btn-outline {
     background: #FFFFFF;
     color: var(--text-primary);
