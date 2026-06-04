@@ -188,20 +188,15 @@ h1, h2, h3, h4 {
 }
 
 .btn-huggingface {
-    background-color: #24292f;
+    background-color: #b45309;
     color: #ffffff;
-    border: 1px solid #24292f;
+    border: 1px solid #b45309;
 }
 
 .btn-huggingface:hover {
-    background-color: #1f2328;
-    border-color: #1f2328;
+    background-color: #92400e;
+    border-color: #92400e;
     color: #ffffff;
-}
-
-.btn-huggingface svg {
-    color: #FFD21E;
-    fill: #FFD21E;
 }
 
 /* Nav Menu */
