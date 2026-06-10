@@ -1,4 +1,4 @@
-// Video2LoRA Project Website Javascript Controller
+// Frames2LoRA Project Website Javascript Controller
 
 document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------------------------------
