@@ -58,7 +58,7 @@
     <section class="section" style="padding: 3rem 0; border-bottom: none;">
         <div class="container" style="text-align: center;">
             <div class="glass-card" style="padding: 2rem; margin-bottom: 0;">
-                <img src="Frames2LoRA-actual-animated.svg" alt="Frames2LoRA Overview" style="width: 100%; height: auto; max-width: 900px; margin-bottom: 1.5rem;">
+                <img src="Frames2LoRA-actual-animated.gif" alt="Frames2LoRA Overview" style="width: 100%; height: auto; max-width: 900px; margin-bottom: 1.5rem;">
                 <p class="caption" style="text-align: left; max-width: 900px; margin: 0 auto; font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary);">
                     <strong>Figure 1: FRAMES2LORA overview.</strong> <strong>Training (left):</strong> A frozen VLM encodes the input video into hidden states. The trainable FRAMES2LORA hypernetwork reads these states and generates LoRA adapter weights in a single forward pass. The adapter-augmented frozen VLM is trained against teacher-generated targets. <strong>Inference (right):</strong> Given a new video, FRAMES2LORA generates the LoRA adapter once. The frozen VLM, augmented with this adapter, answers arbitrary text queries without visual tokens. Per-query cost is independent of video length.
                 </p>
@@ -172,7 +172,7 @@
                         <div style="display: flex; flex-direction: column; gap: 1.25rem; align-items: center;">
                             <div style="width: 100%; text-align: center;">
                                 <img src="media/paper_fig1a_token_f1_delta_heatmap.svg" alt="Change in mean Token-F1" style="width: 100%; height: auto; max-width: 420px;">
-                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; font-weight: 500;">(a) Change in mean Token-F1 (V2L &minus; Base)</p>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; font-weight: 500;">(a) Change in mean Token-F1 (F2L &minus; Base)</p>
                             </div>
                             <div style="width: 100%; text-align: center;">
                                 <img src="media/paper_fig1b_ttft_speedup_heatmap.svg" alt="Query-time TTFT speedup" style="width: 100%; height: auto; max-width: 420px;">
@@ -221,7 +221,7 @@
                 <div id="table-1" class="tab-content active">
                     <h3 style="margin: 1.5rem 0 0.5rem; font-size:1.25rem; text-align: center;">Table 1: Comparison across Captioning Benchmarks</h3>
                     <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 800px; margin: 0.5rem auto 1.5rem;">
-                        Comparison of the base model with video and FRAMES2LORA generated adapters, across captioning benchmarks using LLM Judge scores and Token F1. We report mean scores, the paired difference &Delta; (V2L &minus; Base), 95% confidence intervals, and the statistical equivalence (Eq) and non-inferiority (NI) criteria.
+                        Comparison of the base model with video and FRAMES2LORA generated adapters, across captioning benchmarks using LLM Judge scores and Token F1. We report mean scores, the paired difference &Delta; (F2L &minus; Base), 95% confidence intervals, and the statistical equivalence (Eq) and non-inferiority (NI) criteria.
                     </p>
                     
                     <h4 style="margin: 1.5rem 0 0.5rem; font-size:1.1rem; color: #1E293B;">1. LLM Judge Score (Rescaled [0, 1])</h4>
@@ -235,13 +235,13 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
                                     <th style="text-align: center;">NI</th>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
@@ -354,13 +354,13 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
                                     <th style="text-align: center;">NI</th>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
@@ -467,7 +467,7 @@
                 <div id="table-4" class="tab-content">
                     <h3 style="margin: 1.5rem 0 0.5rem; font-size:1.25rem; text-align: center;">Table 4: Comparison across Video Question Answering Benchmarks</h3>
                     <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 800px; margin: 0.5rem auto 1.5rem;">
-                        Comparison of the base model with video and FRAMES2LORA generated adapters, across video question answering benchmarks using LLM Judge scores and Token F1. We report mean scores, the paired difference &Delta; (V2L &minus; Base), 95% confidence intervals, and the statistical equivalence (Eq) and non-inferiority (NI) criteria.
+                        Comparison of the base model with video and FRAMES2LORA generated adapters, across video question answering benchmarks using LLM Judge scores and Token F1. We report mean scores, the paired difference &Delta; (F2L &minus; Base), 95% confidence intervals, and the statistical equivalence (Eq) and non-inferiority (NI) criteria.
                     </p>
                     
                     <h4 style="margin: 1.5rem 0 0.5rem; font-size:1.1rem; color: #1E293B;">1. LLM Judge Score (Rescaled [0, 1])</h4>
@@ -481,13 +481,13 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
                                     <th style="text-align: center;">NI</th>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
@@ -585,13 +585,13 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
                                     <th style="text-align: center;">NI</th>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L</th>
+                                    <th style="text-align: center;">F2L</th>
                                     <th style="text-align: center;">&Delta;</th>
                                     <th style="text-align: center;">95% CI</th>
                                     <th style="text-align: center;">Eq</th>
@@ -696,9 +696,9 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                    <th style="text-align: center;">F2L (&Delta;)</th>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                    <th style="text-align: center;">F2L (&Delta;)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -759,9 +759,9 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                    <th style="text-align: center;">F2L (&Delta;)</th>
                                     <th style="text-align: center;">Base</th>
-                                    <th style="text-align: center;">V2L (&Delta;)</th>
+                                    <th style="text-align: center;">F2L (&Delta;)</th>
                                 </tr>
                             </thead>
                             <tbody>
